@@ -1,13 +1,14 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+
 package com.universidad.modelo;
 
-/**
- *
- * @author jeto
- */
+import com.universidad.modelo.Estudiante;
+
 public class ArbolABB {
     
+    private NodoABB raiz;
+
+    public ArbolABB() {
+        this.raiz = null;
+    }
+
 }
