@@ -7,7 +7,7 @@ public class NodoABB {
     private NodoABB izquierdo;
     private NodoABB derecho;
 
-    public NodoABB(Estudiante estudiante, NodoABB izquierdo, NodoABB derecho) {
+    public NodoABB(Estudiante estudiante) {
         this.estudiante = estudiante;
         this.izquierdo = null;
         this.derecho = null;

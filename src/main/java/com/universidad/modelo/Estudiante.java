@@ -20,6 +20,14 @@ public class Estudiante {
         this.correo = correo;
     }
 
+    public String getDni() {
+        return dni;
+    }
+
+    public void setDni(String dni) {
+        this.dni = dni;
+    }
+
     public String getNombre() {
         return nombre;
     }
@@ -62,7 +70,8 @@ public class Estudiante {
 
     @Override
     public String toString() {
-        return "Matricula: " + matricula + " | DNI: " + dni + " | Nombre: " + nombre + " " + apellido + " | Programa: " + programa + " | Semestre: " + semestre + " | Correo: " + correo;
+        return "Matricula: " + matricula + " | DNI: " + dni + " | Nombre: " + nombre + " " + apellido + " | Programa: "
+                + programa + " | Semestre: " + semestre + " | Correo: " + correo;
     }
 
 }
