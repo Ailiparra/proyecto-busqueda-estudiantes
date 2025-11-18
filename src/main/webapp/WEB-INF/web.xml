@@ -6,7 +6,7 @@
          version="3.1">
 
     <resource-ref>
-        <description>Base de datos Estudiantes MySQL</description>
+        <description>Base de datos estudiantes MySQL</description>
         <res-ref-name>jdbc/estudiantes</res-ref-name>
         <res-type>javax.sql.DataSource</res-type>
         <res-auth>Container</res-auth>
