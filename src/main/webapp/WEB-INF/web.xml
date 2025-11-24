@@ -7,9 +7,19 @@
 
     <resource-ref>
         <description>Base de datos estudiantes MySQL</description>
-        <res-ref-name>jdbc/estudiantes</res-ref-name>
+        <res-ref-name>jdbc/EstudiantesDB</res-ref-name>
         <res-type>javax.sql.DataSource</res-type>
         <res-auth>Container</res-auth>
     </resource-ref>
+
+    <servlet>
+        <servlet-name>EstudiantesServlet</servlet-name>
+        <servlet-class>com.universidad.servlet.EstudiantesServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>EstudiantesServlet</servlet-name>
+        <url-pattern>/Estudiantes</url-pattern>
+    </servlet-mapping>
 
 </web-app>

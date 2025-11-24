@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Context>
-    <Resource name="jdbc/estudiantes"
+    <Resource name="jdbc/EstudiantesDB"
               auth="Container"
               type="javax.sql.DataSource"
               maxTotal="100"
@@ -9,5 +9,5 @@
               username="root"
               password=""
               driverClassName="com.mysql.cj.jdbc.Driver"
-              url="jdbc:mysql://localhost:3306/estudiante?useSSL=false&amp;serverTimezone=UTC"/>
+              url="jdbc:mysql://localhost:3306/estudiantes?useSSL=false&amp;serverTimezone=UTC"/>
 </Context>

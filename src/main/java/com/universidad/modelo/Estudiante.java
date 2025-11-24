@@ -8,18 +8,19 @@ package com.universidad.modelo;
 public class Estudiante {
     // Atributos principales
     private int matricula;
-    private String dni;
+    private int dni;
     private String nombre;
     private String apellido;
     private String programa;
     private int semestre;
     private String correo;
+    private String password;
 
     // Constructor vacío
     public Estudiante() { }
 
     // Constructor completo
-    public Estudiante(int matricula, String dni, String nombre, String apellido, String programa, int semestre, String correo) {
+    public Estudiante(int matricula, int dni, String nombre, String apellido, String programa, int semestre, String correo, String password) {
         this.matricula = matricula;
         this.dni = dni;
         this.nombre = nombre;
@@ -27,7 +28,17 @@ public class Estudiante {
         this.programa = programa;
         this.semestre = semestre;
         this.correo = correo;
+        this.password = password;
     }
+
+    public Estudiante(int matricula, String programa, int semestre, String correo, String password) {
+        this.matricula = matricula;
+        this.programa = programa;
+        this.semestre = semestre;
+        this.correo = correo;
+        this.password = password;
+    }
+    
 
     // Getters y Setters
     public int getMatricula() {
@@ -38,11 +49,11 @@ public class Estudiante {
         this.matricula = matricula;
     }
 
-    public String getDni() {
+    public int getDni() {
         return dni;
     }
 
-    public void setDni(String dni) {
+    public void setDni(int dni) {
         this.dni = dni;
     }
 
@@ -85,6 +96,13 @@ public class Estudiante {
     public void setCorreo(String correo) {
         this.correo = correo;
     }
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
     // Método toString (opcional, útil para depuración)
     @Override
@@ -92,7 +110,8 @@ public class Estudiante {
         return "Estudiante [matricula=" + matricula + ", dni=" + dni + 
                ", nombre=" + nombre + ", apellido=" + apellido +
                ", programa=" + programa + ", semestre=" + semestre +
-               ", correo=" + correo + "]";
+               ", correo=" + correo + ",+]";
+        
     }
 }
 

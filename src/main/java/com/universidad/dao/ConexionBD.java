@@ -1,7 +1,6 @@
 
 package com.universidad.dao;
 
-
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
@@ -28,23 +27,30 @@ public class ConexionBD {
             return true;
         } catch (NamingException | SQLException e) {
             e.printStackTrace();
+            conexion = null;
             return false;
         }
+    }
+    
+    // Entrega la referencia a la conexión activa
+    public Connection getConexion() {
+        return conexion;
     }
 
     // Inserta un nuevo estudiante en la BD
     public boolean insertarEstudiante(Estudiante est) {
-        String sql = "INSERT INTO estudiante (matricula, dni, nombre, apellido, programa, semestre, correo) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO estudiante (matricula, dni, nombre, apellido, programa, semestre, correo, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = conexion.prepareStatement(sql)) {
             stmt.setInt(1, est.getMatricula());
-            stmt.setString(2, est.getDni());
+            stmt.setInt(2, est.getDni());
             stmt.setString(3, est.getNombre());
             stmt.setString(4, est.getApellido());
             stmt.setString(5, est.getPrograma());
             stmt.setInt(6, est.getSemestre());
             stmt.setString(7, est.getCorreo());
-            stmt.executeUpdate();
-            return true;
+            stmt.setString(8, est.getPassword());
+            int filas = stmt.executeUpdate();
+            return filas > 0;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
@@ -55,7 +61,7 @@ public class ConexionBD {
     public boolean actualizarEstudiante(Estudiante est) {
         String sql = "UPDATE estudiante SET dni = ?, nombre = ?, apellido = ?, programa = ?, semestre = ?, correo = ? WHERE matricula = ?";
         try (PreparedStatement stmt = conexion.prepareStatement(sql)) {
-            stmt.setString(1, est.getDni());
+            stmt.setInt(1, est.getDni());
             stmt.setString(2, est.getNombre());
             stmt.setString(3, est.getApellido());
             stmt.setString(4, est.getPrograma());
@@ -92,12 +98,13 @@ public class ConexionBD {
             while (rs.next()) {
                 Estudiante est = new Estudiante(
                     rs.getInt("matricula"),
-                    rs.getString("dni"),
+                    rs.getInt("dni"),
                     rs.getString("nombre"),
                     rs.getString("apellido"),
                     rs.getString("programa"),
                     rs.getInt("semestre"),
-                    rs.getString("correo")
+                    rs.getString("correo"),
+                    rs.getString("password")
                 );
                 lista.add(est);
             }
@@ -106,8 +113,32 @@ public class ConexionBD {
         }
         return lista;
     }
+    public Estudiante loginEstudiante(String correo, String password) {
+        String sql = "SELECT * FROM estudiante WHERE correo = ? AND password = ?";
+        try (PreparedStatement stmt = conexion.prepareStatement(sql)) {
+            stmt.setString(1, correo);
+            stmt.setString(2, password);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return new Estudiante(
+                        rs.getInt("matricula"),
+                        rs.getInt("dni"),
+                        rs.getString("nombre"),
+                        rs.getString("apellido"),
+                        rs.getString("programa"),
+                        rs.getInt("semestre"),
+                        rs.getString("correo"),
+                        rs.getString("password")
+                    );
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
-    // Obtiene un estudiante por matrícula específica
+    // Obtiene una consulta de estudiante por matrícula específica
     public Estudiante obtenerEstudiantePorMatricula(int matricula) {
         String sql = "SELECT * FROM estudiante WHERE matricula = ?";
         try (PreparedStatement stmt = conexion.prepareStatement(sql)) {
@@ -116,12 +147,13 @@ public class ConexionBD {
                 if (rs.next()) {
                     return new Estudiante(
                         rs.getInt("matricula"),
-                        rs.getString("dni"),
+                        rs.getInt("dni"),
                         rs.getString("nombre"),
                         rs.getString("apellido"),
                         rs.getString("programa"),
                         rs.getInt("semestre"),
-                        rs.getString("correo")
+                        rs.getString("correo"),
+                        rs.getString("password")
                     );
                 }
             }
@@ -150,14 +182,11 @@ public class ConexionBD {
         if (conexion != null) {
             try {
                 conexion.close();
+                conexion = null;
             } catch (SQLException e) {
                 e.printStackTrace();
             }
         }
     }
-
-    // Getter para la conexión (opcional)
-    public Connection getConexion() {
-        return conexion;
-    }
+    
 }

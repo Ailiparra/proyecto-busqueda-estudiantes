@@ -1,6 +1,7 @@
 
 package com.universidad.servlet;
 
+import com.universidad.dao.ConexionBD;
 import com.universidad.modelo.Estudiante;
 import com.universidad.negocio.SistemaRegistro;
 import javax.servlet.ServletException;
@@ -12,57 +13,92 @@ import java.util.ArrayList;
  *
  * @author Ailiparra
  */
-@WebServlet(name = "EstudianteServlet", urlPatterns = {"/estudiante"})
+@WebServlet(name = "EstudianteServlet", urlPatterns = {"/estudiante", "/listarEstudiantes", "/login"})
 public class EstudianteServlet extends HttpServlet {
-
-    private SistemaRegistro sistema;
-
-    @Override
-    public void init() throws ServletException {
-        sistema = new SistemaRegistro(); // Inicializa ABB y conexión BD
-    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Listar todos los estudiantes por defecto
-        ArrayList<Estudiante> lista = sistema.obtenerTodos();
-        request.setAttribute("estudiantes", lista);
-        request.getRequestDispatcher("listarEstudiantes.jsp").forward(request, response);
+        String path = request.getServletPath();
+        ConexionBD conexion = new ConexionBD();
+
+        if ("/listarEstudiantes".equals(path)) {
+            if (conexion.conectar()) {
+                ArrayList<Estudiante> lista = conexion.obtenerEstudiantes();
+                request.setAttribute("estudiantes", lista);
+                conexion.cerrar();
+            }
+            request.getRequestDispatcher("listarEstudiantes.jsp").forward(request, response);
+
+        } else if ("/login".equals(path)) {
+            // Muestra formulario de login
+            request.getRequestDispatcher("loginEstudiante.jsp").forward(request, response);
+
+        } else {
+            // Formulario de registro
+            request.getRequestDispatcher("registrarEstudiante.jsp").forward(request, response);
+        }
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String accion = request.getParameter("accion");
+        String path = request.getServletPath();
+        ConexionBD conexion = new ConexionBD();
 
-        if ("registrar".equals(accion)) {
-            // Registrar nuevo estudiante desde formulario
-            // (Valida que todos los campos requeridos están presentes)
-            int matricula = sistema.generarMatricula();
-            String dni = request.getParameter("dni");
-            String nombre = request.getParameter("nombre");
-            String apellido = request.getParameter("apellido");
-            String programa = request.getParameter("programa");
-            int semestre = Integer.parseInt(request.getParameter("semestre"));
-            String correo = request.getParameter("correo");
-            Estudiante nuevo = new Estudiante(matricula, dni, nombre, apellido, programa, semestre, correo);
+        if ("/estudiante".equals(path)) {
+            // Registro
+            if (conexion.conectar()) {
+                int matricula = conexion.generarMatricula();
+                int dni = Integer.parseInt(request.getParameter("dni"));
+                String nombre = request.getParameter("nombre");
+                String apellido = request.getParameter("apellido");
+                String programa = request.getParameter("programa");
+                int semestre = Integer.parseInt(request.getParameter("semestre"));
+                String correo = request.getParameter("correo");
+                String password = request.getParameter("password");
 
-            boolean exito = sistema.registrarEstudiante(nuevo);
-            if (exito) {
-                request.setAttribute("mensaje", "Estudiante registrado con éxito");
-            } else {
-                request.setAttribute("error", "Error al registrar estudiante");
+                Estudiante nuevo = new Estudiante(matricula, dni, nombre, apellido, programa, semestre, correo, password);
+
+                boolean exito = conexion.insertarEstudiante(nuevo);
+                conexion.cerrar();
+
+                if (exito) {
+                    response.sendRedirect("listarEstudiantes");
+                    return;
+                } else {
+                    request.setAttribute("error", "Error al registrar estudiante");
+                    request.getRequestDispatcher("registrarEstudiante.jsp").forward(request, response);
+                    return;
+                }
             }
-            doGet(request, response);
         }
-        else if ("buscar".equals(accion)) {
-            // Buscar estudiante por matrícula desde formulario
-            int matriculaBuscada = Integer.parseInt(request.getParameter("matricula"));
-            Estudiante encontrado = sistema.buscarPorMatricula(matriculaBuscada);
-            request.setAttribute("estudiante", encontrado);
-            request.getRequestDispatcher("detalleEstudiante.jsp").forward(request, response);
+        
+        else if ("/login".equals(path)) {
+            // Login
+            String correo = request.getParameter("correo");
+            String password = request.getParameter("password");
+
+            if (conexion.conectar()) {
+                Estudiante est = conexion.loginEstudiante(correo, password);
+                conexion.cerrar();
+                if (est != null) {
+                    // Guarda estudiante en sesión tras login
+                    HttpSession sesion = request.getSession();
+                    sesion.setAttribute("estudianteLogueado", est);
+                    // Redirige a dashboard para evitar reenviar datos al recargar
+                    response.sendRedirect("dashboardEstudiante.jsp");
+                    return;
+                } else {
+                    request.setAttribute("error", "Correo o contraseña incorrectos");
+                    request.getRequestDispatcher("loginEstudiante.jsp").forward(request, response);
+                    return;
+                }
+            } else {
+                request.setAttribute("error", "Error de conexión a la base de datos.");
+                request.getRequestDispatcher("loginEstudiante.jsp").forward(request, response);
+                return;
+            }
         }
-        // Puedes agregar más acciones aquí (actualizar, eliminar, etc.)
     }
 }
